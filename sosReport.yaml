@@ -1,0 +1,12 @@
+---
+- hosts: nodes
+  user: root
+
+  tasks:
+  - name: Install the latest version of sos
+    yum:
+      name: sos
+      state: latest
+
+  - name: Run sosreport
+    command: echo "\n" | sosreport --ticket-number=02003016 --name=`hostname` 

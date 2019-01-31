@@ -1,0 +1,17 @@
+---
+- hosts: nodes
+  user: root
+
+  tasks:
+  - name: Update Docker Options
+    replace:
+      path: /etc/sysconfig/docker
+      regexp: '--selinux-enabled'
+      replace: '--selinux-enabled --signature-verification=false'
+      backup: yes
+
+  - name: Restart Docker Service
+    service:
+      name: docker.service
+      state: restarted
+...
