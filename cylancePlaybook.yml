@@ -1,0 +1,26 @@
+---
+- name: Playbook to install Cylance on Supported Hosts
+  hosts: all
+
+  vars:
+    redhat: ansible_os_family == "RedHat"
+    bit64: ansible_userspace_bits == "64"
+    rhel6: ansible_distribution_major_version == "6"
+    rhel7: ansible_distribution_major_version == "7"
+    rhel8: ansible_distribution_major_version == "8"
+    rhel6_pkg: 
+    rhel7_pkg:
+    rhel8_pkg:
+
+  tasks:
+    - name: Getting '{{ rhel6_pkg }}' from repo
+      when: rhel6
+
+    - name: Getting '{{ rhel7_pkg }}' from repo
+      when: rhel7
+
+    - name: Getting '{{ rhel8_pkg }}' from repo
+      when: rhel8
+
+  handlers:
+    - name: Installing '{{ pkg }}'
