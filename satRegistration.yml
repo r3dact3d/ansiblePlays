@@ -9,19 +9,26 @@
           <ansible-vault encrypt_string --name 'bradySecret'>
     server: server.domain.com
     katello_ca: katello-ca-consumer-latest.noarch.rpm
+    puppet_conf: puppet.conf
     pkgs:
       - katello-agent
       - insights-client
       - puppet
-    org_id: 1
+    svs:
+      - goferd
+      - puppet
+    org: OrgName
     activationkey: rhel7_standard_prod
     ansible_become_pass: '{{ bradySecret }}'
   tasks:
-    - name: Download '{{ katello_agent }}' from '{{ server }}'
+    - name: 'Download {{ katello_ca }} and {{puppet_conf}} from {{ server }}'
       get_url:
-        url: 'https://{{ server }}/pub/{{ katello_ca }}'
-        dest: '/tmp/{{ katello_ca }}'
+        url: 'https://{{ server }}/pub/{{ item }}'
+        dest: /tmp/
         validate_certs: no
+      with_items:
+        - '{{ katello_ca }}'
+        - '{{ puppet_conf }}'
     - name: Install '{{ katello_ca }}'
       yum:
         name: '/tmp/{{ katello_ca }}'
@@ -30,7 +37,7 @@
     - name: Register to '{{ server }}'
       redhat_subscription:
         state: present
-        org_id: '{{ org_id }}'
+        org_id: '{{ org }}'
         activationkey: '{{ activationkey }}'
     - name: Install support packages
       yum:
@@ -41,5 +48,25 @@
         name: '{{ item }}'
         enabled: yes
         state: started
-      with_items: '{{ pkgs }}'
-    
+      with_items: '{{ svs }}'
+    - name: 'Put {{ puppet_conf }} on target hosts'
+      copy:
+        src: '/tmp/{{ puppet_conf }}'
+        dest: '/etc/puppetlabs/puppet/{{ puppet_conf }}'
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Create puppet cert 
+      command: puppet agent -tv
+      register: puppet_output
+    - name: Print puppet output 
+      debug:
+        msg: '{{ puppet_output }}'
+    - name: Register insights 
+      command: insights-client --register
+      register: insights_output
+    - name: Print insights output
+      debug:
+        msg: '{{ insights_output }}'
+
+
