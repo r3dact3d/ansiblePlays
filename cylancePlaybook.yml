@@ -3,36 +3,86 @@
   hosts: all
 
   vars:
+    target_package: cylanceProtect
+    satellite: server.domain.com
     redhat: ansible_os_family == "RedHat"
     bit64: ansible_userspace_bits == "64"
     rhel6: ansible_distribution_major_version == "6"
     rhel7: ansible_distribution_major_version == "7"
     rhel8: ansible_distribution_major_version == "8"
-    rhel6_pkg: 
+    rhel6_pkg:
     rhel7_pkg:
     rhel8_pkg:
+    config_file: cylanceConfig.txt
+    install_dir: /opt/cylance
 
   tasks:
+    # Prechecks - is target package already installed and running?
+    - name: 'Checking {{ target_package }} installed status' 
+      package_facts:
+        manager: rpm
+
+    - name: Print the rpm package facts
+      debug:
+        var: 'ansible_facts.package{{ target_package }}'
+
+    - name: 'Checking {{ target_package }} process status'
+      pids:
+        name: '{{ target_package }}'
+      register: '{{ target_package }}'_pids
+ 
     - name: Getting '{{ rhel6_pkg }}' from repo
       get_url:
-        url: 'https://u74rhsat.motel6.com/pub/{{ rhel6_pkg }}'
+        url: 'https://{{ satellite }}/pub/{{ rhel6_pkg }}'
         dest: '/tmp/{{ rhel6_pkg }}'
         validate_certs: no
+      notify: Install '{{ pkg }}'
       when: rhel6
 
     - name: Getting '{{ rhel7_pkg }}' from repo
       get_url:
-        url: 'https://u74rhsat.motel6.com/pub/{{ rhel7_pkg }}'
+        url: 'https://{{ satellite }}/pub/{{ rhel7_pkg }}'
         dest: '/tmp/{{ rhel7_pkg }}'
         validate_certs: no
+      notify: Install '{{ pkg }}'
       when: rhel7
 
     - name: Getting '{{ rhel8_pkg }}' from repo
       get_url:
-        url: 'https://u74rhsat.motel6.com/pub/{{ rhel8_pkg }}'
+        url: 'https://{{ satellite }}/pub/{{ rhel8_pkg }}'
         dest: '/tmp/{{ rhel8_pkg }}'
         validate_certs: no
+      notify: Install '{{ pkg }}'
       when: rhel8
 
+    - name: Check Cylance directory
+      stat:
+        path: '{{ install_dir }}'
+      register: dir
+
+    - name: 'Is {{ install_dir }} already existing?'
+      debug:
+        msg: '{{ install_dir }}' exists
+      when: dir.stat.exists
+
+    - name: Create '{{ install_dir }}'
+      file:
+        path: '{{ install_dir }}'
+        state: directory
+        mode: '0755'
+      notify: Getting '{{ config_file}}'
+      when: not dir.stat.exists
+
+   
+
+
+
+
+
   handlers:
-    - name: Installing '{{ pkg }}'
+    - name: Getting '{{ config_file }}'
+      get_url:
+        url: 'https://{{ satellite }}/pub/{{ config_file }}'
+        dest: '{{ install_dir }}'
+        validate_certs: no
+    - name: Install '{{ pkg }}'
