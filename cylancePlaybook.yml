@@ -14,12 +14,24 @@
 
   tasks:
     - name: Getting '{{ rhel6_pkg }}' from repo
+      get_url:
+        url: 'https://u74rhsat.motel6.com/pub/{{ rhel6_pkg }}'
+        dest: '/tmp/{{ rhel6_pkg }}'
+        validate_certs: no
       when: rhel6
 
     - name: Getting '{{ rhel7_pkg }}' from repo
+      get_url:
+        url: 'https://u74rhsat.motel6.com/pub/{{ rhel7_pkg }}'
+        dest: '/tmp/{{ rhel7_pkg }}'
+        validate_certs: no
       when: rhel7
 
     - name: Getting '{{ rhel8_pkg }}' from repo
+      get_url:
+        url: 'https://u74rhsat.motel6.com/pub/{{ rhel8_pkg }}'
+        dest: '/tmp/{{ rhel8_pkg }}'
+        validate_certs: no
       when: rhel8
 
   handlers:
