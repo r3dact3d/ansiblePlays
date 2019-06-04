@@ -18,7 +18,7 @@
       - goferd
       - puppet
     org: OrgName
-    activationkey: rhel7_standard_prod
+    activationkey: rhel6_standard_dev
     ansible_become_pass: '{{ bradySecret }}'
   tasks:
     - name: 'Download {{ katello_ca }} and {{puppet_conf}} from {{ server }}'
