@@ -2,29 +2,44 @@
 - name: Register Host to Satellite 6.5
   hosts: localhost
   become: yes
-  
+  become_user: root
   vars:
+    bradySecret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          <ansible-vault encrypt_string --name 'bradySecret'>
     server: server.domain.com
-    pkg:
-      katello_ca: katello-ca-consumer-latest.noarch.rpm
-      katello: katello_agent
-      insights: insights-client
-      puppet: puppet
+    katello_ca: katello-ca-consumer-latest.noarch.rpm
+    pkgs:
+      - katello-agent
+      - insights-client
+      - puppet
     org_id: 1
     activationkey: rhel7_standard_prod
-  
+    ansible_become_pass: '{{ bradySecret }}'
   tasks:
-    - name: Download '{{ pkg.katello_ca }}' from '{{ server }}'
+    - name: Download '{{ katello_agent }}' from '{{ server }}'
       get_url:
-        url: 'https://{{ server }}/pub/{{ pkg.katello_ca }}'
-        dest: '/tmp/{{ pkg.katello_ca }}'
+        url: 'https://{{ server }}/pub/{{ katello_ca }}'
+        dest: '/tmp/{{ katello_ca }}'
         validate_certs: no
-    - name: Install '{{ pkg.katello_ca }}'
+    - name: Install '{{ katello_ca }}'
       yum:
-        name: '/tmp/{{ pkg.katello_ca }}'
+        name: '/tmp/{{ katello_ca }}'
         state: present
+      ignore_errors: yes
     - name: Register to '{{ server }}'
       redhat_subscription:
         state: present
         org_id: '{{ org_id }}'
         activationkey: '{{ activationkey }}'
+    - name: Install support packages
+      yum:
+        name: '{{ pkgs }}'
+        state: latest
+    - name: Start support packages
+      service:
+        name: '{{ item }}'
+        enabled: yes
+        state: started
+      with_items: '{{ pkgs }}'
+    
