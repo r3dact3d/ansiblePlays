@@ -41,7 +41,7 @@
     
     - name: remove bootstrap.py
       file:
-        path: "{{ bootstrap_target_path }}"
+        path: "{{ bootstrap_path }}"
         state: absent
 
     - name: Install insights-client
@@ -52,7 +52,7 @@
     - name: Register insights 
       command: insights-client --register
       register: insights_output
-      
+
     - name: Print insights output
       debug:
         msg: '{{ insights_output }}'
