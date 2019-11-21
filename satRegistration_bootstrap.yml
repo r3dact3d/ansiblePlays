@@ -4,32 +4,42 @@
   become: yes
   become_user: root
   vars:
-    # Put your satellite server FQDN name here
+    # Put your satellite/capsule server FQDN name here
     server: server.domain.com
     # Put your Satellite Organization name here
     org: OrgName
     # Put your lifeCycle you are going to register here.
     lifeCycleEnv: lab
+    # Put your location to register to
+    loc: Location
+    # Put your activation key
+    activationkey: '{{lifeCycleEnv}}-rhel{{ ansible_distribution_major_version }}'  
+    # Put your Host Group here
+    hostgroup: HostGroup
+    # Put credentials for user that has role to run bootstrap here
+    login: ""
+    password: ""
+    # Addition args.... duh
+    additional_args: "--skip-puppet"
+    # Path to bootstrap.py
+    bootstrap_path: /root/bootstrap.py
+
+
 
   tasks:
     - name: 'Download bootstrap.py from {{ server }}'
       get_url:
         url: 'https://{{ server }}/pub/bootstrap.py'
-        dest: /tmp/
+        dest: '{{ bootstrap_path }}'
         validate_certs: no
 
-    - name: Make bootstrap.py executable
-      file:
-        path: /tmp/bootstrap.py
-        owner: root
-        group: root
-        mode: 0744
+    - name: generate bootstrap.py arguments
+        set_fact:
+          bootstrap_args: "--server '{{ server }}'' --organization '{{ org }}' --location '{{ loc }}' --activationkey '{{ activationkey }}'"
+          bootstrap_foreman_args: "{% if bootstrap_password != '' %}--login '{{ login }}' --password '{{ password }}' --hostgroup '{{ hostgroup }}'{% else %}--skip foreman{% endif %}"
 
-    - name: Register to '{{ server }}'
-      redhat_subscription:
-        state: present
-        org_id: '{{ org }}'
-        activationkey: '{{lifeCycleEnv}}-rhel{{ ansible_distribution_major_version }}'  
+    - name: run bootstrap.py
+        command: "python {{ bootstrap_path }} {{ bootstrap_args }} {{ bootstrap_foreman_args }} {{ additional_args }}"
 
     - name: Install insights-client
       yum:
