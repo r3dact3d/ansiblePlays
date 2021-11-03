@@ -25,4 +25,5 @@ jobs:
       - name: Setup
         run: |
           export KUBECONFIG=${{ secrets.KUBECONFIG }}
+          oc login --token=${{ secrets.TOKEN }} --server=https://api.blinker19.sandbox1016.opentlc.com:6443
           oc version
