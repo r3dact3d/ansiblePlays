@@ -1,1 +1,2 @@
-test with oc login
+* test with oc login
+* test
