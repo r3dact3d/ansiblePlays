@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@main
       - name: Setup Working Directory 
         run: |
-          echo "We can do something here"
+          echo ${{ secrets.KUBECONFIG }} >> kubeconfig
           sleep 30
         
       - name: Install OpenShift CLI tools
@@ -24,6 +24,5 @@ jobs:
           
       - name: Setup
         run: |
-          export KUBECONFIG=${{ secrets.KUBECONFIG }}
-          oc login --token=${{ secrets.TOKEN }} --server=https://api.blinker19.sandbox1016.opentlc.com:6443
+          export KUBECONFIG=kubeconfig
           oc version
