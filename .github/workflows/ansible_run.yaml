@@ -1,0 +1,28 @@
+name: Run ansible code 
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'test.md'
+jobs:
+  Setup:
+    name: Setup OpenShift Installer Binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Setup Working Directory 
+        run: |
+          echo "We can do something here"
+          sleep 30
+        
+      - name: Install OpenShift CLI tools
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          openshift-install: "4"
+          oc: "4"
+          
+      - name: Setup
+        run: |
+          export KUBECONFIG=${{ secrets.KUBECONFIG }}
+          oc version
