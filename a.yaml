@@ -13,18 +13,18 @@
       register: nodes
       
     - debug:
-        var: nodes.stdout
+        var: nodes
         
     - name: Get channel for operator from packagemanifest
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.defaultChannel}' --kubeconfig "{{ KUBECONFIG }}"
       register: CHANNEL
       
     - name: Get catalog source for operator from packagemanifest
-      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.catalogSource}'
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.catalogSource}' --kubeconfig "{{ KUBECONFIG }}"
       register: CATALOG_SOURCE
       
     - name: Check if Operator Group is needed
-      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}'
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}' --kubeconfig "{{ KUBECONFIG }}"
       register: INSTALL_MODE
       failed_when: "false not in INSTALL_MODE.stdout"
       
@@ -34,7 +34,7 @@
         dest: subscription.yaml
          
     - name: Deploy operator
-      command: oc apply -f subscription.yaml
+      command: oc apply -f subscription.yaml --kubeconfig "{{ KUBECONFIG }}"
       register: subscription
       
     - debug:
