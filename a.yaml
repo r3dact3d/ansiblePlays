@@ -13,7 +13,7 @@
       register: nodes
       
     - debug:
-        var: nodes
+        var: nodes.stdout
         
     - name: Get channel for operator from packagemanifest
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.defaultChannel}' --kubeconfig "{{ KUBECONFIG }}"
