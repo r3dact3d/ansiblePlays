@@ -27,3 +27,5 @@ jobs:
         uses: dawidd6/action-ansible-playbook@v2.5.0
         with:
           playbook: a.yaml
+          options: |
+            --extra-vars KUBECONFIG="${{ secrets.KUBECONFIG }}"
