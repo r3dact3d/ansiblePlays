@@ -26,7 +26,7 @@
         src: subscription.j2
         dest: subscription.yaml
          
-    - name: Deploy "{{ OPERATOR_NAME }}" 
+    - name: Deploy operator 
       command: oc apply -f subscription.yaml
       register: subscription
       debug:
