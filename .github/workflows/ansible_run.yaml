@@ -11,12 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Setup Working Directory 
-        run: |
-          echo ${{ secrets.KUBECONFIG }} >> kubeconfig
-          sleep 30
-        
-      - name: Install OpenShift CLI tools
+        name: Install OpenShift CLI tools
         uses: redhat-actions/openshift-tools-installer@v1
         with:
           openshift-install: "4"
@@ -24,5 +19,6 @@ jobs:
           
       - name: Setup
         run: |
+          echo "${{ secrets.KUBECONFIG }}" >> kubeconfig
           export KUBECONFIG=kubeconfig
           oc version
