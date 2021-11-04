@@ -21,8 +21,6 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" >> kubeconfig
           export KUBECONFIG=kubeconfig
-          cp kubeconfig .kube/config
-          oc version
 
       - name: Run Ansible playbook
         uses: dawidd6/action-ansible-playbook@v2.5.0
