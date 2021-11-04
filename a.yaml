@@ -26,7 +26,7 @@
     - name: Check if Operator Group is needed
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}' --kubeconfig "{{ KUBECONFIG }}"
       register: INSTALL_MODE
-      failed_when: "false not in INSTALL_MODE.stdout"
+      failed_when: "'false' not in INSTALL_MODE.stdout"
       
     - name: Use Jinja2 template to configure subscription
       template:
