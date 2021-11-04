@@ -29,5 +29,6 @@
     - name: Deploy operator
       command: oc apply -f subscription.yaml
       register: subscription
-      debug:
+      
+    - debug:
         var: subscription
