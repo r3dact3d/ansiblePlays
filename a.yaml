@@ -9,7 +9,7 @@
       command: oc version
 
     - name: Get nodes
-      command: oc get nodes --kubeconfig "{{ KUBECONFIG }}"
+      command: oc get nodes --kubeconfig "${{ secrets.KUBECONFIG }}"
       register: nodes
       
     - debug:
