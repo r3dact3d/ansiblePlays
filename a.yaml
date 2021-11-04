@@ -22,9 +22,9 @@
       failed_when: "false not in INSTALL_MODE.stdout"
       
     - name: Use Jinja2 template to configure subscription
-       template:
-         src: subscription.j2
-         dest: subscription.yaml
+      template:
+        src: subscription.j2
+        dest: subscription.yaml
          
     - name: Deploy {{ OPERATOR_NAME }} 
       command: oc apply -f subscription.yaml
