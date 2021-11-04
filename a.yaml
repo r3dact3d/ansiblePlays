@@ -9,15 +9,15 @@
       command: oc version
 
     - name: Get channel for operator from packagemanifest
-      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace -o jsonpath='{.status.defaultChannel}'
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.defaultChannel}'
       register: CHANNEL
       
     - name: Get catalog source for operator from packagemanifest
-      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace -o jsonpath='{.status.catalogSource}'
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.catalogSource}'
       register: CATALOG_SOURCE
       
     - name: Check if Operator Group is needed
-      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}'
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}'
       register: INSTALL_MODE
       failed_when: "false not in INSTALL_MODE.stdout"
       
@@ -26,7 +26,7 @@
         src: subscription.j2
         dest: subscription.yaml
          
-    - name: Deploy {{ OPERATOR_NAME }} 
+    - name: Deploy "{{ OPERATOR_NAME }}" 
       command: oc apply -f subscription.yaml
       register: subscription
       
