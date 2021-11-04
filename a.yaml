@@ -5,16 +5,6 @@
      OPERATOR_NAME: web-terminal
      NAMESPACE: openshift-operators
   tasks:
-    - name: Check that oc client
-      command: oc version
-
-    - name: Get nodes
-      command: echo "{{ KUBECONFIG }}"
-      register: nodes
-      
-    - debug:
-        var: nodes
-        
     - name: Get channel for operator from packagemanifest
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.defaultChannel}' --kubeconfig "{{ KUBECONFIG }}"
       register: CHANNEL
