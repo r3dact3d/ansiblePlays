@@ -1,19 +1,29 @@
 ---
 - name: Tests for verifying the OpenShift installation (Lab-Module 1)
   hosts: localhost
+  vars:
+     OPERATOR_NAME: web-terminal
+     NAMESPACE: openshift-operators
   tasks:
     - name: Check that oc client
       command: oc version
 
     - name: Get channel for operator from packagemanifest
-      command: oc get packagemanifest dynatrace-operator -n openshift-marketplace -o jsonpath='{.status.defaultChannel}'
-      register: channel
+      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace -o jsonpath='{.status.defaultChannel}'
+      register: CHANNEL
       
     - name: Get catalog source for operator from packagemanifest
-      command: oc get packagemanifest dynatrace-operator -n openshift-marketplace -o jsonpath='{.status.catalogSource}'
-      register: catalog_source
+      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace -o jsonpath='{.status.catalogSource}'
+      register: CATALOG_SOURCE
+      
+    - name: Check if Operator Group is needed
+      command: oc get packagemanifest {{ OPERATOR_NAME }} -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}'
+      register: INSTALL_MODE
+      failed_when: "false not in INSTALL_MODE.stdout"
       
     - name: use Jinja2 template to configure subscription
        template:
          src: subscription.j2
          dest: subscription.yaml
+
+ 
