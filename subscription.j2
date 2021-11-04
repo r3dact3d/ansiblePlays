@@ -7,8 +7,8 @@ metadata:
   name: {{ OPERATOR_NAME }}
   namespace: {{ NAMESPACE }}
 spec:
-  channel: '{{ CHANNEL }}'
+  channel: '{{ CHANNEL.stdout }}'
   installPlanApproval: Automatic
   name: {{ OPERATOR_NAME }}
-  source: {{ CATALOG_SOURCE }}
+  source: {{ CATALOG_SOURCE.stdout }}
   sourceNamespace: openshift-marketplace
