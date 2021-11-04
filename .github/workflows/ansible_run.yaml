@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-        name: Install OpenShift CLI tools
+      - name: Install OpenShift CLI tools
         uses: redhat-actions/openshift-tools-installer@v1
         with:
           openshift-install: "4"
