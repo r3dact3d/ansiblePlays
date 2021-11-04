@@ -12,6 +12,7 @@
       command: echo "{{ KUBECONFIG }}"
       register: nodes
       
+      
     - debug:
         var: nodes.stdout
         
