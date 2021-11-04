@@ -24,7 +24,6 @@ jobs:
           export KUBECONFIG=kubeconfig
           cat kubeconfig
           echo $KUBECONFIG
-        working-directory: ./temp
 
       - name: Run Ansible playbook
         uses: dawidd6/action-ansible-playbook@v2.5.0
