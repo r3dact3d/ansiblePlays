@@ -6,3 +6,4 @@
 * burn it
 * then burn
 * the ashes
+* smores
