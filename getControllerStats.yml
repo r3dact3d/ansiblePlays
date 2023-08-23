@@ -7,9 +7,9 @@
   gather_facts: true
   vars:
     # Using the Tower env names for backwards compatibility
-    controller_hostname: "{{ lookup('ansible.builtin.env', 'TOWER_HOSTNAME') }}"
+    # controller_hostname: "{{ lookup('ansible.builtin.env', 'TOWER_HOSTNAME') }}"
     controller_username: "{{ controller_user | default('admin') }}"
-    controller_password: "{{ lookup('ansible.builtin.env', 'TOWER_PASSWORD') }}"
+    # controller_password: "{{ lookup('ansible.builtin.env', 'TOWER_PASSWORD') }}"
     controller_validate_certs: "{{ lookup('ansible.builtin.env', 'TOWER_VERIFY_SSL') | default(false) }}"
 
   tasks:
