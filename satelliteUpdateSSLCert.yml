@@ -1,40 +1,40 @@
 ---
 - name: Update SSL Certs for hosts of Satellite 6.5
   hosts: prod
-  become: yes
+  become: true
   become_user: root
   vars:
     bradySecret: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          ************
-    ansible_become_pass: '{{ bradySecret }}'
+      $ANSIBLE_VAULT;1.1;AES256
+      ************
+    ansible_become_pass: "{{ bradySecret }}"
     server: SatServer.motel6.com
     katello_ca: katello-ca-consumer-latest.noarch.rpm
   tasks:
-    - name: 'Download {{ katello_ca }} from {{ server }}'
+    - name: Download {{ katello_ca }} from {{ server }}
       get_url:
-        url: 'https://{{ server }}/pub/{{ katello_ca }}'
+        url: https://{{ server }}/pub/{{ katello_ca }}
         dest: /tmp/
-        validate_certs: no
+        validate_certs: false
     - name: Remove Old Satellite Cert
       yum:
-        name: 'katello-ca-consumer*'
+        name: katello-ca-consumer*
         state: absent
     - name: Install '{{ katello_ca }}'
       yum:
-        name: '/tmp/{{ katello_ca }}'
+        name: /tmp/{{ katello_ca }}
         state: present
-      ignore_errors: yes
+      ignore_errors: true
     - name: Create puppet cert
       puppet:
-      ignore_errors: yes
+      ignore_errors: true
       register: puppet_output
     - name: Print puppet output
       debug:
-        msg: '{{ puppet_output }}'
+        msg: "{{ puppet_output }}"
     - name: Register insights
       command: insights-client --status
       register: insights_output
     - name: Print insights output
       debug:
-        msg: '{{ insights_output }}'
+        msg: "{{ insights_output }}"
