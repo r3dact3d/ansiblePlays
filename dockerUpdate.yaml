@@ -3,14 +3,15 @@
   user: root
 
   tasks:
-    - name: Update Docker Options
-      ansible.builtin.replace:
-        path: /etc/sysconfig/docker
-        regexp: --selinux-enabled
-        replace: --selinux-enabled --signature-verification=false
-        backup: true
+  - name: Update Docker Options
+    replace:
+      path: /etc/sysconfig/docker
+      regexp: '--selinux-enabled'
+      replace: '--selinux-enabled --signature-verification=false'
+      backup: yes
 
-    - name: Restart Docker Service
-      ansible.builtin.service:
-        name: docker.service
-        state: restarted
+  - name: Restart Docker Service
+    service:
+      name: docker.service
+      state: restarted
+...

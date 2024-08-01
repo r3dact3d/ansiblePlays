@@ -14,7 +14,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -53,7 +53,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -65,7 +65,7 @@
       shell: oc login -u system:admin
 
     - name: change to project of fancyuser1
-      shell: oc project my-database-app
+      shell:  oc project my-database-app
 
     - name: check route
       shell: oc get route/rails-pgsql-persistent
@@ -106,8 +106,7 @@
       register: pv_volume_path
 
     - name: check gluster volume of pv
-      shell: oc exec -n container-native-storage $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout
-        }}
+      shell: oc exec -n container-native-storage $(oc get pod -n container-native-storage --no-headers | head -1 | awk '{print $1}') -- gluster vol info {{ pv_volume_path.stdout }}
       changed_when: false
 
     - name: check health of postgres-db deployment
@@ -137,7 +136,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -178,8 +177,7 @@
       shell: oc volume dc/file-uploader --add --name=my-shared-storage -t pvc --claim-mode=ReadWriteMany --claim-size=5Gi --claim-name=my-shared-storage --mount-path=/opt/app-root/src/uploaded
 
     - name: wait for php app replication controller to be updated
-      shell: oc get rc -o 
-        jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
+      shell: oc get rc -o jsonpath='{$.items[?(@.spec.selector.deploymentconfig=="file-uploader")].spec.template.spec.volumes[?(@.persistentVolumeClaim.claimName=="my-shared-storage")].name}'
       register: php_app_update_rc_check
       until: '"shared-storage" in php_app_update_rc_check.stdout'
       retries: 30
@@ -207,7 +205,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -278,7 +276,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -294,8 +292,8 @@
 
     - name: uncomment additional cns lines
       replace:
-        regexp: "#addcns_"
-        replace: ""
+        regexp: '#addcns_'
+        replace: ''
         path: /etc/ansible/hosts
       tags:
         - scaleup
@@ -308,7 +306,7 @@
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-        insertbefore: ^COMMIT
+        insertbefore: "^COMMIT"
       delegate_to: "{{ item }}"
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
       become: true
@@ -316,8 +314,8 @@
     - name: insert iptables rules required for GlusterFS
       lineinfile:
         dest: /etc/sysconfig/iptables
-        line: :OS_FIREWALL_ALLOW - [0:0]
-        insertbefore: -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+        line: ':OS_FIREWALL_ALLOW - [0:0]'
+        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
       delegate_to: "{{ item }}"
       with_items: "{{ new_cns_nodes_internal_fqdn }}"
       become: true
@@ -338,7 +336,7 @@
       shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.desiredNumberScheduled}' -n {{cns_namespace}}
       register: check_daemonset_desired
       failed_when: check_daemonset_desired.stdout == ""
-      changed_when: false
+      changed_when: False
 
     - name: wait for daemonset to have desired nodes ready
       shell: oc get daemonset -o jsonpath='{$.items[?(@.metadata.name=="glusterfs")].status.numberReady}' -n {{cns_namespace}}
@@ -405,7 +403,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -428,10 +426,10 @@
 
     - set_fact:
         iptables_rules:
-          - -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
-          - -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
-          - -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
-          - -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT"
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT"
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT"
+          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT"
 
     - name: ensure firewall rules are present on CNS nodes
       shell: iptables -w -S OS_FIREWALL_ALLOW
@@ -441,7 +439,7 @@
       with_nested:
         - "{{ iptables_rules }}"
         - "{{ new_cns_nodes_internal_fqdn }}"
-      changed_when: false
+      changed_when: False
       become: true
 
     - name: ensure additional storage nodes have correct label
@@ -519,7 +517,7 @@
 
     - name: check second storage class carries second clusters id
       fail:
-        msg: cluster id {{ clusterid2 }} is not set in storageclass {{ cns_storageclass2 }}
+        msg: "cluster id {{ clusterid2 }} is not set in storageclass {{ cns_storageclass2 }}"
       when: storageclass2.parameters.clusterid != clusterid2
 
     - name: check presence of additional devices in nodes
@@ -544,7 +542,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -557,16 +555,14 @@
       changed_when: false
 
     - name: get heketi ID of first node of second CNS cluster
-      shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0,
-        /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
+      shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
       register: heketi_node_4_query
 
     - set_fact:
         heketi_node_4_id: "{{ heketi_node_4_query.stdout }}"
 
     - name: get heketi ID of first device of this node
-      shell: heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep {{node_brick_device}} |
-        awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'
+      shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} node info {{ heketi_node_4_id }} | grep {{node_brick_device}} | awk 'match($0, /Id:([a-z0-9].*) Name:/, result) { print result[1] }'"
       register: heketi_node_4_device_query
 
     - set_fact:
@@ -596,7 +592,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -605,8 +601,7 @@
         node4_internal_fqdn: " {{ NODE4_INTERNAL_FQDN }}"
 
     - name: get heketi ID of first node of second CNS cluster
-      shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0,
-        /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
+      shell: "heketi-cli --user=admin --secret {{ heketi_admin_pw }} --server {{ heketi_resturl }} topology info | grep -B4 {{ node4_internal_fqdn }} | awk 'match($0, /Node Id: ([a-z0-9].*)/, result) { print result[1] }'"
       register: heketi_node_4_query
       changed_when: false
 
@@ -634,7 +629,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"
@@ -662,7 +657,7 @@
       retries: 30
       delay: 10
 
-    # without retry we suffer from the following error: Scaling the resource failed with: Operation cannot be fulfilled on deploymentconfigs "docker-registry": the object has been modified; please apply your changes to the latest version and try again; Current resource version Unknown
+      # without retry we suffer from the following error: Scaling the resource failed with: Operation cannot be fulfilled on deploymentconfigs "docker-registry": the object has been modified; please apply your changes to the latest version and try again; Current resource version Unknown
     - name: scale the registry deployment to 3
       shell: oc scale dc/docker-registry --replicas=3
       register: scale_dc
@@ -692,7 +687,7 @@
           - "{{NODE4_INTERNAL_FQDN}}"
           - "{{NODE5_INTERNAL_FQDN}}"
           - "{{NODE6_INTERNAL_FQDN}}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         heketi_admin_pw: "{{ HEKETI_ADMIN_PW }}"
         cns_storageclass2: "{{CNS_STORAGECLASS2}}"
         ocp_routing_suffix: "{{OCP_ROUTING_SUFFIX}}"

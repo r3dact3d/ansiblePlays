@@ -6,9 +6,11 @@
 
   tasks:
     - name: Ensure key is in '{{ user }}' /'s ~/.ssh/authorized_hosts
+      authorized_key:
+        user: '{{ user }}'
+        state: present
+        key: '{{ item }}'
       with_file:
         - ~/.ssh.id_rsa.pub
-      ansible.posix.authorized_key:
-        user: "{{ user }}"
-        state: present
-        key: "{{ item }}"
+
+...

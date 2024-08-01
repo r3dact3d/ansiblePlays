@@ -3,31 +3,32 @@
   hosts: masters
   become_user: root
   tasks:
+
     - name: Login as system:admin
-      ansible.builtin.command: oc login -u system:admin
+      command: oc login -u system:admin
 
     - name: Check for app-management project
-      ansible.builtin.command: oc get project app-management
+      command: oc get project app-management
 
     - name: Check for mapit dc
-      ansible.builtin.command: oc get dc mapit
+      command: oc get dc mapit
 
     - name: Check for mapit route
-      ansible.builtin.command: oc get route mapit
+      command: oc get route mapit
 
     - name: Check if mapit pod is there
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
 
     - name: Check for mapit liveness probe
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].livenessProbe}'
+      command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].livenessProbe}'
 
     - name: Check for mapit readiness probe
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].readinessProbe}'
+      command: oc get dc mapit -o jsonpath='{.spec.template.spec.containers[?(@.name=="mapit")].readinessProbe}'
 
     - name: Check for two app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
       register: result
       failed_when: '"2" not in result.stdout'
 
-      # should probably check for two service endpoints but it seems like a messy
-      # job right now
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+    # should probably check for two service endpoints but it seems like a messy
+    # job right now

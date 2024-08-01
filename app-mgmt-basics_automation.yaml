@@ -4,53 +4,54 @@
   become_user: root
   tasks:
     - name: Login as system:admin
-      ansible.builtin.command: oc login -u system:admin
+      command: oc login -u system:admin
 
     - name: Check for app-management project
+      command: oc get project app-management
       register: app_project_out
       ignore_errors: true
-      ansible.builtin.command: oc get project app-management
 
     - name: Create app-management project
+      command: oc new-project app-management
       when: app_project_out | failed
-      ansible.builtin.command: oc new-project app-management
 
     - name: Check for the sample application
+      command: oc get dc mapit
       register: app_dc_out
       ignore_errors: true
-      ansible.builtin.command: oc get dc mapit
 
     - name: Deploy the sample application
+      command: oc new-app docker.io/siamaksade/mapit -n app-management
       when: app_dc_out | failed
-      ansible.builtin.command: oc new-app docker.io/siamaksade/mapit -n app-management
 
     - name: Wait for app to be running
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
       register: result
       until: '"1" in result.stdout'
       retries: 10
       delay: 15
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
 
     - name: Set mapit liveness probe
-      ansible.builtin.command: oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
+      command: oc set probe dc/mapit --liveness --get-url=http://:8080/health --initial-delay-seconds=30
 
     - name: Set mapit readiness probe
-      ansible.builtin.command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
+      command: oc set probe dc/mapit --readiness --get-url=http://:8080/health --initial-delay-seconds=30
 
     - name: Check for mapit route
+      command: oc get route mapit
       register: mapit_route_out
       ignore_errors: true
-      ansible.builtin.command: oc get route mapit
 
     - name: Create mapit route
-      ansible.builtin.command: oc expose service mapit
+      command: oc expose service mapit
 
     - name: Scale to two instances
-      ansible.builtin.command: oc scale dc/mapit --replicas=2
+      command: oc scale dc/mapit --replicas=2
 
     - name: Wait for both app instances
+      command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
       register: result
       until: '"2" in result.stdout'
       retries: 10
       delay: 15
-      ansible.builtin.command: oc get dc mapit -o jsonpath='{.status.availableReplicas}' -n app-management
+
