@@ -10,14 +10,14 @@
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
           -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-        insertbefore: ^COMMIT
+        insertbefore: "^COMMIT"
       become: true
 
     - name: insert iptables rules required for GlusterFS
       lineinfile:
         dest: /etc/sysconfig/iptables
-        line: :OS_FIREWALL_ALLOW - [0:0]
-        insertbefore: -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+        line: ':OS_FIREWALL_ALLOW - [0:0]'
+        insertbefore: "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"
       become: true
 
     - name: reload iptables
@@ -29,6 +29,7 @@
 - hosts: localhost
   name: Install and configure CNS
   tasks:
+
     - include_vars: /opt/lab/environment.yml
 
     - name: login via oc as system:admin to default namespace
@@ -47,7 +48,7 @@
       stat:
         path: /opt/lab/support/topology.json
       register: topology_file
-      changed_when: false
+      changed_when: False
       failed_when: not topology_file.stat.exists
 
     - set_fact:
@@ -73,7 +74,7 @@
 
     - set_fact:
         ocp_routing_suffix: "{{ OCP_ROUTING_SUFFIX }}"
-        heketi_resturl: http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}
+        heketi_resturl: "http://heketi-{{CNS_NAMESPACE}}.{{OCP_ROUTING_SUFFIX}}"
         cns_storageclass: "{{ CNS_STORAGECLASS }}"
 
     - name: get cluster-id from heketi

@@ -38,7 +38,7 @@
     - name: Validate the public address
       uri:
         url: "{{ api_health_url }}"
-        validate_certs: false
+        validate_certs: False
         status_code: 200
         method: GET
       changed_when: false

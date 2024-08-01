@@ -1,7 +1,7 @@
 ---
 - name: Register Host to Satellite 6.6
   hosts: localhost
-  become: true
+  become: yes
   become_user: root
   vars:
     # Put your satellite/capsule server FQDN name here
@@ -13,47 +13,48 @@
     # Put your location to register to
     loc: Location
     # Put your activation key
-    activationkey: "{{lifeCycleEnv}}-rhel{{ ansible_distribution_major_version }}"
+    activationkey: '{{lifeCycleEnv}}-rhel{{ ansible_distribution_major_version }}'  
     # Put your Host Group here
     hostgroup: HostGroup
     # Put credentials for user that has role to run bootstrap here
     login: ""
     password: ""
     # Addition args.... duh
-    additional_args: --skip-puppet
+    additional_args: "--skip-puppet"
     # Path to bootstrap.py
     bootstrap_path: /root/bootstrap.py
 
   tasks:
-    - name: Download bootstrap.py from {{ server }}
-      ansible.builtin.get_url:
-        url: https://{{ server }}/pub/bootstrap.py
-        dest: "{{ bootstrap_path }}"
-        validate_certs: false
+    - name: 'Download bootstrap.py from {{ server }}'
+      get_url:
+        url: 'https://{{ server }}/pub/bootstrap.py'
+        dest: '{{ bootstrap_path }}'
+        validate_certs: no
 
     - name: generate bootstrap.py arguments
-      ansible.builtin.set_fact:
-        bootstrap_args: --server '{{ server }}'' --organization '{{ org }}' --location '{{ loc }}' --activationkey '{{ activationkey }}'
-        bootstrap_foreman_args: "{% if password != '' %}--login '{{ login }}' --password '{{ password }}' --hostgroup '{{ hostgroup }}'{% else %}--skip foreman{%
-          endif %}"
+      set_fact:
+        bootstrap_args: "--server '{{ server }}'' --organization '{{ org }}' --location '{{ loc }}' --activationkey '{{ activationkey }}'"
+        bootstrap_foreman_args: "{% if password != '' %}--login '{{ login }}' --password '{{ password }}' --hostgroup '{{ hostgroup }}'{% else %}--skip foreman{% endif %}"
 
     - name: run bootstrap.py
-      ansible.builtin.command: python {{ bootstrap_path }} {{ bootstrap_args }} {{ bootstrap_foreman_args }} {{ additional_args }}
-
+      command: "python {{ bootstrap_path }} {{ bootstrap_args }} {{ bootstrap_foreman_args }} {{ additional_args }}"
+    
     - name: remove bootstrap.py
-      ansible.builtin.file:
+      file:
         path: "{{ bootstrap_path }}"
         state: absent
 
     - name: Install insights-client
-      ansible.builtin.yum:
+      yum:
         name: insights-client
         state: latest
 
-    - name: Register insights
+    - name: Register insights 
+      command: insights-client --register
       register: insights_output
-      ansible.builtin.command: insights-client --register
 
     - name: Print insights output
-      ansible.builtin.debug:
-        msg: "{{ insights_output }}"
+      debug:
+        msg: '{{ insights_output }}'
+
+

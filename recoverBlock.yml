@@ -1,13 +1,12 @@
----
-- block:
-    - name: Check web site from web server
-      uri:
-        url: http://{{ ansible_fqdn }}
-        return_content: yes
-      register: example_webpage
-      failed_when: example_webpage.status != 200
-
-    - name: Restart web server
-      ansible.builtin.service:
-        name: httpd
-        status: restarted
+  - block:
+      - name: Check web site from web server
+        uri:
+          url: http://{{ ansible_fqdn }}
+          return_content: yes
+        register: example_webpage
+        failed_when: example_webpage.status != 200
+    rescue:
+      - name: Restart web server
+        service:
+          name: httpd
+          status: restarted
