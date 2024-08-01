@@ -3,19 +3,19 @@
   hosts: masters
   tasks:
     - name: Check for the project request template
-      command: oc get template project-request -n default
       register: template_output
       ignore_errors: true
+      ansible.builtin.command: oc get template project-request -n default
 
-    - name: Create the project-request template in the namespace 'default' 
-      command: oc create -f /opt/lab/support/project_request_template.yaml -n default
+    - name: Create the project-request template in the namespace 'default'
       when: template_output | failed
-      
+      ansible.builtin.command: oc create -f /opt/lab/support/project_request_template.yaml -n default
+
     - name: modify the master-config.yaml to create project request template
-      lineinfile:
+      ansible.builtin.lineinfile:
         line: '  projectRequestTemplate: "default/project-request"'
         regexp: '  projectRequestTemplate: ""'
         path: /etc/origin/master/master-config.yaml
-    
+
     - name: Restart the service for changes to apply
-      command: systemctl restart atomic-openshift-master
+      ansible.builtin.command: systemctl restart atomic-openshift-master

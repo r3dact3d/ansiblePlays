@@ -8,8 +8,8 @@
 
     - name: uncomment scaleup lines
       replace:
-        regexp: '#scaleup_'
-        replace: ''
+        regexp: "#scaleup_"
+        replace: ""
         path: /etc/ansible/hosts
       tags:
         - scaleup
@@ -30,17 +30,17 @@
     - name: Check for additional node
       command: oc get node {{ item }}
       with_items:
-        - "node04.internal.aws.testdrive.openshift.com"
-        - "node05.internal.aws.testdrive.openshift.com"
-        - "node06.internal.aws.testdrive.openshift.com"
+        - node04.internal.aws.testdrive.openshift.com
+        - node05.internal.aws.testdrive.openshift.com
+        - node06.internal.aws.testdrive.openshift.com
       tags:
         - scaleup
         - scaleup_test
 
     - name: Uncomment metrics lines
       replace:
-        regexp: '#metrics_'
-        replace: ''
+        regexp: "#metrics_"
+        replace: ""
         path: /etc/ansible/hosts
       tags:
         - metrics
@@ -49,7 +49,7 @@
       lineinfile:
         path: /etc/ansible/hosts
         state: absent
-        regexp: 'openshift_metrics_install_metrics=false'
+        regexp: openshift_metrics_install_metrics=false
       tags:
         - metrics
 
@@ -105,8 +105,8 @@
 
     - name: Uncomment logging lines
       replace:
-        regexp: '#logging_'
-        replace: ''
+        regexp: "#logging_"
+        replace: ""
         path: /etc/ansible/hosts
       tags:
         - logging
@@ -115,7 +115,7 @@
       lineinfile:
         path: /etc/ansible/hosts
         state: absent
-        regexp: 'openshift_logging_install_logging=false'
+        regexp: openshift_logging_install_logging=false
       tags:
         - logging
 
@@ -267,8 +267,8 @@
       retries: 2
       delay: 60
       with_items:
-        - "netproj-a"
-        - "netproj-b"
+        - netproj-a
+        - netproj-b
       tags:
         - networking
 

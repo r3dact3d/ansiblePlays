@@ -2,30 +2,31 @@
 - name: Tests for verifying the OpenShift installation (Lab-Module 1)
   hosts: localhost
   vars:
-     OPERATOR_NAME: web-terminal
-     NAMESPACE: openshift-operators
+    OPERATOR_NAME: web-terminal
+    NAMESPACE: openshift-operators
   tasks:
     - name: Get channel for operator from packagemanifest
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.defaultChannel}' --kubeconfig "{{ KUBECONFIG }}"
       register: CHANNEL
-      
+
     - name: Get catalog source for operator from packagemanifest
       command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace -o jsonpath='{.status.catalogSource}' --kubeconfig "{{ KUBECONFIG }}"
       register: CATALOG_SOURCE
-      
+
     - name: Check if Operator Group is needed
-      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}' --kubeconfig "{{ KUBECONFIG }}"
+      command: oc get packagemanifest "{{ OPERATOR_NAME }}" -n openshift-marketplace  -o jsonpath='{.status.channels[].currentCSVDesc.installModes[3]}' --kubeconfig
+        "{{ KUBECONFIG }}"
       register: INSTALL_MODE
       failed_when: "'true' not in INSTALL_MODE.stdout"
-      
+
     - name: Use Jinja2 template to configure subscription
       template:
         src: subscription.j2
         dest: subscription.yaml
-         
+
     - name: Deploy operator
       command: oc apply -f subscription.yaml --kubeconfig "{{ KUBECONFIG }}"
       register: subscription
-      
+
     - debug:
         var: subscription

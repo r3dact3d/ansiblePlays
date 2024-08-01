@@ -3,10 +3,10 @@
   user: root
 
   tasks:
-  - name: Install the latest version of sos
-    yum:
-      name: sos
-      state: latest
+    - name: Install the latest version of sos
+      ansible.builtin.yum:
+        name: sos
+        state: latest
 
-  - name: Run sosreport
-    command: echo "\n" | sosreport --ticket-number=02003016 --name=`hostname` 
+    - name: Run sosreport
+      ansible.builtin.command: echo "\n" | sosreport --ticket-number=02003016 --name=`hostname`

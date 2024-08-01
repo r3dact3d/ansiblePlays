@@ -3,12 +3,11 @@
   remote_user: root
   tasks:
     - name: Updating the DNS Masq for VPC Endpoints
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/dnsmasq.d/node-dnsmasq.conf
-        line: 'server=/sns.us-east-1.amazonaws.com/169.254.169.253'
+        line: server=/sns.us-east-1.amazonaws.com/169.254.169.253
 
     - name: Restart DnsMasq Service
-      service:
+      ansible.builtin.service:
         name: dnsmasq.service
         state: restarted
-... 

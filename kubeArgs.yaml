@@ -3,26 +3,19 @@
   user: root
 
   tasks:
-  - name: Configure node kubletArguments
-    blockinfile:
-      path: /etc/origin/node/node-config.yaml
-      insertafter: "- zone=default"
-      block: |2
-          kube-reserved:
-            - "cpu=200m,memory=1Gi"
-          system-reserved:
-            - "cpu=200m,memory=1Gi"
-          eviction-hard:
-          - memory.available<500Mi
+    - name: Configure node kubletArguments
+      ansible.builtin.blockinfile:
+        path: /etc/origin/node/node-config.yaml
+        insertafter: "- zone=default"
+        block: |2
+            kube-reserved:
+              - "cpu=200m,memory=1Gi"
+            system-reserved:
+              - "cpu=200m,memory=1Gi"
+            eviction-hard:
+            - memory.available<500Mi
 
-  - name: Restart Atomic Node Service
-    service:
-      name: atomic-openshift-node.service
-      state: restarted
-
-...
-
-
-      
-
- 
+    - name: Restart Atomic Node Service
+      ansible.builtin.service:
+        name: atomic-openshift-node.service
+        state: restarted
